@@ -22,13 +22,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BrooklynEightSix/Journal.git"
+    "url": "git+https://github.com/Tanvez/MeJournal.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/BrooklynEightSix/Journal/issues"
+    "url": "https://github.com/Tanvez/MeJournal/issues"
   },
   "dependencies": {
     "axios": "^0.15.3",
@@ -97,5 +97,5 @@
     "webpack": "^2.2.1",
     "webpack-livereload-plugin": "^1.0.0"
   },
-  "homepage": "https://github.com/BrooklynEightSix/Journal#readme"
+  "homepage": "https://github.com/Tanvez/MeJournal#readme"
 }
