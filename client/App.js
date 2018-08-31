@@ -1,11 +1,15 @@
 import React from 'react'
-
-import GqlLogin from './components/gql-auth-form'
+//import {Navbar} from './components'
+import Routes from './routes'
+import Home from './graphqlComponents/Home'
+import Register from './graphqlComponents/Register'
 
 const App = ()=>{
   return(
     <div>
-      <GqlLogin/>
+    <Routes />
+    <Register/>
+    <Home/>
     </div>
   )
 }

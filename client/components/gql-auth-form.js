@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
-import { graphql, compose } from 'react-apollo'
+import { graphql, Query } from 'react-apollo'
 
-import {login} from '../queries'
+import {login, getUserQuery} from '../queries'
 
 /**
  * COMPONENT
@@ -17,20 +17,18 @@ class GqlLogin extends Component {
     this.onSubmit = this.onSubmit.bind(this)
   }
 
-    onSubmit(event){
-      event.preventDefault()
+    onSubmit= ()=>{
+
       //mutation -> variables
-      this.props.currentUser({
-        variables:{
-          username:this.state.username,
-          password:this.state.password
-        }
+     // const {username, password}=this.state
+      const response = this.props.mutate({
+        variables:{username, password}
       })
-      
+      console.log(username,password)
     }
 
  render() {
-   console.log(this.props)
+   //console.log(this.props.mutate)
    return (
     <div>
       <form onSubmit={this.onSubmit} name={name}>
@@ -50,6 +48,6 @@ class GqlLogin extends Component {
   )}
 }
 
-export default graphql(login, {name:"currentUser"})(GqlLogin)
+export default graphql(login)(GqlLogin)
 
 

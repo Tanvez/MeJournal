@@ -14,6 +14,7 @@ module.exports = {
         test: /\.jsx?$/,
         exclude: /(node_modules|bower_components)/,
         loader: 'babel-loader'
+      
       },
        // use the style-loader/css-loader combos for anything matching the .css extension
       {
@@ -28,5 +29,5 @@ module.exports = {
   // When we're in development, we can use this handy live-reload plugin
   // to refresh the page for us every time we make a change to our client-side
   // files. It's like `nodemon` for the front end!
-  plugins: isDev ? [new LiveReloadPlugin({port:35728,appendScriptTag: true})] : []
+  plugins: isDev ? [new LiveReloadPlugin({port: 35727,appendScriptTag: true})] : []
 }

@@ -17,7 +17,10 @@ const cors = require('cors')
 const graphqlHTTP = require('express-graphql')
 const {user, password} = require('../secrets')
 const mongoose = require('mongoose')
-const schema = require('./schema')
+// const schema = require('./schema')
+const { ApolloServer, gql } = require('apollo-server-express')
+const {mergeTypes , mergeResolvers, fileLoader} = require ('merge-graphql-schemas')
+const models = require('./models')
 module.exports = app
 
 /**
@@ -69,10 +72,33 @@ const createApp = () => {
   mongoose.connection.once('open', ()=>{
     console.log('connected to mongodb databasessss')
   })
-  app.use('/graphql', graphqlHTTP({
-    schema,
-    graphiql:true
-  }))
+
+
+  const typeDefs = mergeTypes(fileLoader(path.join(__dirname,'./schemas')), {all:true})
+
+  //will merge even with js/ts?
+  const resolvers = mergeResolvers(fileLoader(path.join(__dirname, "./resolvers")))
+
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    playground: {
+      endpoint: '/graphql',
+      settings: {
+        'editor.cursorShape': 'block',
+        'editor.theme': 'light'
+      }
+    }, context: {
+      models
+    }
+  })
+
+  server.applyMiddleware({ app })
+
+  // app.use('/graphql', graphqlHTTP({
+  //   schema,
+  //   graphiql:true
+  // }))
 
   // static file-serving middleware
   app.use(express.static(path.join(__dirname, '..', 'public')))
@@ -87,7 +113,10 @@ const createApp = () => {
   //     next()
   //   }
   // })
-
+  
+  //so sendFile does not hit the same path and resend index.html again -- Error: Can't set headers after they are sent
+  app.use('/graphql', () => {})
+  
   // sends index.html
   app.use('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public/index.html'))

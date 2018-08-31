@@ -42,4 +42,25 @@ mutation AddBook($name:String!, $genre:String!, $authorId: ID!){
     }
 }
 `
-export { getAuthorsQuery, getBooksQuery , addBookMutation, login}
+
+const signUpMutation = gql`
+    mutation SignUp(
+    		$username:String!
+            $password:  String!
+    		$firstName: String!
+    		$lastName:  String!
+            ){
+                signUp(
+                    username:$username
+                    password:$password
+                    firstName:$firstName
+                    lastName:$lastName
+                    ){
+                        id
+                        username
+                        firstName
+                        lastName
+                    }
+            }
+`
+export { getAuthorsQuery, getBooksQuery , addBookMutation, login, signUpMutation}
