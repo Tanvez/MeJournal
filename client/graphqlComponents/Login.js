@@ -15,13 +15,15 @@ class Login extends Component{
 
     })
   }
-  onSubmit = (evt) =>{
+  onSubmit = async (evt) =>{
     evt.preventDefault()
     const {username, password} = this
     
-    const response = this.props.mutate({
+    const response = await this.props.mutate({
       variables:{username, password}
-    }).then((res)=>console.log(res.data))
+    })
+    //.then((res)=>console.log(res.data))
+    console.log(response)
   }
   onChange = e=>{
     const {name, value} = e.target
