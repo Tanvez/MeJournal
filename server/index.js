@@ -32,7 +32,8 @@ module.exports = app
  * Node process on process.env
  */
 if (process.env.NODE_ENV !== 'production') require('../secrets')
-
+const SECRET = 'VEZ'
+const SECRET2 = 'TAN'
 // passport registration
 passport.serializeUser((user, done) => done(null, user.id))
 passport.deserializeUser((id, done) =>
@@ -89,7 +90,9 @@ const createApp = () => {
         'editor.theme': 'light'
       }
     }, context: {
-      models
+      models,
+      SECRET,
+      SECRET2
     }
   })
 

@@ -1,12 +1,16 @@
 import bcrypt from 'bcrypt';
 import _ from 'lodash';
 
+import {tryLogin} from '../gqlauth'
+
 export default {
   Query: { 
     getUser: (parent, { id }, { models }) => models.User.findById(id),
     allUsers: (parent, args, { models }) => models.User.find()
   },
   Mutation: {
+    login: (parent, {username, password}, {models, SECRET, SECRET2}) => 
+      tryLogin(username, password, models, SECRET),
     signUp: async (parent, {password, lastName, firstName, username}, {models})=>{
       try {
         let existingUser = await models.User.findOne({username})

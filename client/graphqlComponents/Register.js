@@ -28,9 +28,10 @@ class Register extends Component {
  render() {
    return (
     <div>
-      <form onSubmit={this.onSubmit} name={name}>
+    <h1>Register</h1>
+      <form onSubmit={this.onSubmit} >
         <div>
-          <label htmlFor="username"><small>username</small></label>
+          <label htmlFor="username"><small>Username</small></label>
           <input name="username" type="text" onChange={(event)=>this.setState({username:event.target.value})} placeholder="Username"/>
         </div>
         <div>
@@ -60,6 +61,7 @@ const registerMutation = gql`
                     firstName:$firstName
                     lastName:$lastName
                     ){
+                        ok
                         user{
                           id
                           username
