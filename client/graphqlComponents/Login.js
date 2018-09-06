@@ -22,8 +22,13 @@ class Login extends Component{
     const response = await this.props.mutate({
       variables:{username, password}
     })
-    //.then((res)=>console.log(res.data))
-    console.log(response)
+
+    const {ok, token, refreshToken} = response.data.login
+
+    if(ok){
+      localStorage.setItem('token', token)
+      localStorage.setItem('refreshToken', refreshToken)
+    }
   }
   onChange = e=>{
     const {name, value} = e.target

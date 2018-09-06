@@ -15,13 +15,20 @@ class Register extends Component {
       lastName:""
     }}
 
-    onSubmit=  (evt)=>{     
+    onSubmit=  async (evt)=>{     
       evt.preventDefault();
-       const {username, password, firstName, lastName}=this.state
-      const response = this.props.mutate({
+      const {username, password, firstName, lastName}=this.state
+      const response = await this.props.mutate({
         variables:this.state,
         refetchQueries:[{query:allUsersQuery}]
-      }).then((res)=>console.log(res.data))
+      })
+      const {ok, errors} = response.data.signUp
+      console.log('props', this.props.history, response)
+      if(ok){
+        this.props.history.push('/')
+      } else {
+
+      }
        
     }
     
@@ -62,6 +69,10 @@ const registerMutation = gql`
                     lastName:$lastName
                     ){
                         ok
+                        errors{
+                          path
+                          message
+                        }
                         user{
                           id
                           username

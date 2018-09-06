@@ -3,7 +3,6 @@ import _ from 'lodash'
 import jwt from 'jsonwebtoken'
 
 export const createTokens = async (user, secret, secret2) => {
-  console.log('User', user._id)
   const createToken = jwt.sign(
     {
       user:user._id
