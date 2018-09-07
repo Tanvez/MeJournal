@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {extendObservable} from 'mobx'
+import {extendObservable, toJS} from 'mobx'
 import {observer} from 'mobx-react'
 import {gql} from 'apollo-boost'
 import {graphql} from 'react-apollo'
@@ -11,23 +11,27 @@ class Login extends Component{
 
     extendObservable(this,{
       username:'',
-      password:''
+      password:'',
+      errors:{}
 
     })
   }
   onSubmit = async (evt) =>{
     evt.preventDefault()
     const {username, password} = this
-    
     const response = await this.props.mutate({
       variables:{username, password}
     })
 
-    const {ok, token, refreshToken} = response.data.login
-
+    const {ok, token, refreshToken, errors} = response.data.login
+    if(errors) {
+      this.errors = errors
+      // must toJS - console.log(toJS(this.errors))
+    }
     if(ok){
       localStorage.setItem('token', token)
       localStorage.setItem('refreshToken', refreshToken)
+        this.props.history.push('/')
     }
   }
   onChange = e=>{
@@ -43,11 +47,11 @@ class Login extends Component{
       <form onSubmit={this.onSubmit} >
         <div>
           <label htmlFor="username"><small>Username</small></label>
-          <input name="username" type="text" onChange={this.onChange} value={username} placeholder="Username"/>
+          <input name="username" type="text" onChange={this.onChange} value={username} placeholder="Username" required minLength="1"/>
         </div>
         <div>
           <label htmlFor="password"><small>Password</small></label>
-          <input name="password" type="password" onChange={this.onChange} value={password} placeholder="password"/>
+          <input name="password" type="password" onChange={this.onChange} value={password} placeholder="password" required minLength="5"/>
         </div>
         <div>
           <button type="submit">Submit</button>
