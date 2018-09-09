@@ -29,7 +29,6 @@ const mapDispatch = (dispatch)=>{
         const item = evt.target.item.value
         const price = evt.target.price.value
         const userId = evt.target.userId.value
-        console.log({userId, item, price})
         dispatch(addExpenseItem( userId, item, price))
         }
     }

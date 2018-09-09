@@ -3,20 +3,20 @@ const express = require('express')
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
 const compression = require('compression')
-const session = require('express-session')
-const passport = require('passport')
-const SequelizeStore = require('connect-session-sequelize')(session.Store)
 const db = require('./db')
-const sessionStore = new SequelizeStore({db})
 const PORT = process.env.PORT || 8080
 const app = express()
 const socketio = require('socket.io')
+const cors = require('cors')
 
 //GraphQL stuff
 const graphqlHTTP = require('express-graphql')
 const {user, password} = require('../secrets')
 const mongoose = require('mongoose')
-const schema = require('./schema')
+// const schema = require('./schema')
+const { ApolloServer, gql } = require('apollo-server-express')
+const {mergeTypes , mergeResolvers, fileLoader} = require ('merge-graphql-schemas')
+const models = require('./models')
 module.exports = app
 
 /**
@@ -28,18 +28,15 @@ module.exports = app
  * Node process on process.env
  */
 if (process.env.NODE_ENV !== 'production') require('../secrets')
+const SECRET = 'VEZ'
+const SECRET2 = 'TAN'
 
-// passport registration
-passport.serializeUser((user, done) => done(null, user.id))
-passport.deserializeUser((id, done) =>
-  db.models.user.findById(id)
-    .then(user => done(null, user))
-    .catch(done))
-
-const createApp = () => {
+const createApp = async () => {
   // logging middleware
   app.use(morgan('dev'))
-
+  
+  //Cross-origin resource sharing - cross-origin request
+  app.use(cors())
   // body parsing middleware
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: true }))
@@ -47,44 +44,41 @@ const createApp = () => {
   // compression middleware
   app.use(compression())
 
-  // session middleware with passport
-  app.use(session({
-    secret: process.env.SESSION_SECRET || 'my best friend is Cody',
-    store: sessionStore,
-    resave: false,
-    saveUninitialized: false
-  }))
-  app.use(passport.initialize())
-  app.use(passport.session())
-
-  // auth and api routes
-  app.use('/auth', require('./auth'))
-  app.use('/api', require('./api'))
-
   //Graph ql and mlab database
-  mongoose.connect(`mongodb://${user}:${password}@ds127389.mlab.com:27389/gql-journal`)
+  await mongoose.connect(`mongodb://${user}:${password}@ds127389.mlab.com:27389/gql-journal`)
   mongoose.connection.once('open', ()=>{
     console.log('connected to mongodb databasessss')
   })
-  app.use('/graphql', graphqlHTTP({
-    schema,
-    graphiql:true
-  }))
+
+
+  const typeDefs = mergeTypes(fileLoader(path.join(__dirname,'./schemas')), {all:true})
+
+  //will merge even with js/ts?
+  const resolvers = mergeResolvers(fileLoader(path.join(__dirname, "./resolvers")))
+
+  const server = await new ApolloServer({
+    typeDefs,
+    resolvers,
+    playground: {
+      endpoint: '/graphql',
+      settings: {
+        'editor.cursorShape': 'block',
+        'editor.theme': 'light'
+      }
+    }, context: {
+      models,
+      SECRET,
+      SECRET2
+    }
+  })
+
+  server.applyMiddleware({ app })
 
   // static file-serving middleware
   app.use(express.static(path.join(__dirname, '..', 'public')))
 
-  // any remaining requests with an extension (.js, .css, etc.) send 404
-  // app.use((req, res, next) => {
-  //   if (path.extname(req.path).length) {
-  //     const err = new Error('Not found')
-  //     err.status = 404
-  //     next(err)
-  //   } else {
-  //     next()
-  //   }
-  // })
-
+  app.use('/graphql', () => {})
+  
   // sends index.html
   app.use('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public/index.html'))
@@ -98,26 +92,18 @@ const createApp = () => {
   })
 }
 
-const startListening = () => {
+const startListening = async () => {
   // start listening (and create a 'server' object representing our server)
-  const server = app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
+  const server = await app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
 
   // set up our socket control center
   const io = socketio(server)
   require('./socket')(io)
 }
 
-const syncDb = () => db.sync()
-
-// This evaluates as true when this file is run directly from the command line,
-// i.e. when we say 'node server/index.js' (or 'nodemon server/index.js', or 'nodemon server', etc)
-// It will evaluate false when this module is required by another module - for example,
-// if we wanted to require our app in a test spec
 if (require.main === module) {
-  sessionStore.sync()
-    .then(syncDb)
-    .then(createApp)
-    .then(startListening)
+    createApp()
+    startListening()
 } else {
   createApp()
 }
