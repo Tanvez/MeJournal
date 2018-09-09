@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import { graphql } from 'react-apollo'
 import {gql} from 'apollo-boost'
-import { red100, red500 } from 'material-ui/styles/colors';
+import {  red500 } from 'material-ui/styles/colors';
 
 /**
  * COMPONENT

@@ -12,6 +12,7 @@ import App from './app'
 //Connecting to apollo component tree
 import { ApolloProvider } from 'react-apollo';
 
+
 // establishes socket connection
 import './socket'
 
